@@ -38,7 +38,7 @@ public:
                 case 'w':
                     watcher_on = true;
                 default:
-                    std::cerr << "Unknown option\n";
+                    std::cerr << "Unknown command line option\n";
                     exit(1);
             }
         }
