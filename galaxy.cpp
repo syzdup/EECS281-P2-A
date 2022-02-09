@@ -69,7 +69,7 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
             if(median_on && num_battles != 0) {
                 for(int i = 0; i < int(planets.size()); ++i) {
                     if(planets[i].battle_occured) {
-                        std::cout << "Median troops lost on planet " << i << " at time " << current_time << " is " << planets[i].get_median() << "\n";
+                        std::cout << "Median troops lost on planet " << i << " at time " << current_time << " is " << planets[i].get_median() << ".\n";
                     }
                 }
             }
@@ -93,7 +93,7 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
     if(median_on && num_battles != 0) {
         for(int i = 0; i < int(planets.size()); ++i) {
             if(planets[i].battle_occured) {
-                std::cout << "Median troops lost on planet " << i << " at time " << current_time << " is " << planets[i].get_median() << "\n";
+                std::cout << "Median troops lost on planet " << i << " at time " << current_time << " is " << planets[i].get_median() << ".\n";
             }
         }
     }
