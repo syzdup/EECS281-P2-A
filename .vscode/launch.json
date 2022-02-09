@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Launch",
-            "type": "lldb",
+            "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/galaxy_debug",
             "args": ["-v", "-m", "<", "${workspaceFolder}/spec-DL-in.txt"],
@@ -14,7 +14,7 @@
             "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "lldb",
+            "MIMode": "gdb",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",

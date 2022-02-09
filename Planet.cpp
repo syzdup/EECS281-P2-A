@@ -2,16 +2,18 @@
 #include "Planet.h"
 #include <iostream>
 // Check to see if a fight will happen, to be called after pushing a new deployment to PQ
-void Planet::check_match(bool verbose_on, int planet_num) {
+void Planet::check_match(bool verbose_on, int planet_num, int &num_battles) {
     if(!jedi_pq.empty() && !sith_pq.empty()) {
         if(jedi_pq.top().force_sensitivity <= sith_pq.top().force_sensitivity) {
-            fight(verbose_on, planet_num);
+            fight(verbose_on, planet_num, num_battles);
+            battle_occured = true;
         }
     }
 }
 
-void Planet::fight(bool verbose_on, int planet_num) {
+void Planet::fight(bool verbose_on, int planet_num, int &num_battles) {
     int troops_lost = 0;
+    num_battles += 1;
     Deployment temp_jedi(jedi_pq.top().unique_id ,jedi_pq.top().timestamp, jedi_pq.top().general_id, jedi_pq.top().force_sensitivity, jedi_pq.top().num_troops);
     Deployment temp_sith(sith_pq.top().unique_id ,sith_pq.top().timestamp, sith_pq.top().general_id, sith_pq.top().force_sensitivity, sith_pq.top().num_troops);
     if(jedi_pq.top().num_troops > sith_pq.top().num_troops) {
@@ -38,7 +40,7 @@ void Planet::fight(bool verbose_on, int planet_num) {
     // After a battle occurs, update the median, balance
     update_median(troops_lost);
     balance_median();
-    check_match(verbose_on, planet_num);
+    check_match(verbose_on, planet_num, num_battles);
 }
 
 void Planet::update_median(int troops_lost) {

@@ -11,11 +11,13 @@ class Planet {
         // If heaps are same size, take average of the top of each, else take the top of the larger one
         std::priority_queue<int> lower_pq;
         std::priority_queue<int, std::vector<int>, std::greater<int> > upper_pq;
+        // Has a battle occured
+        bool battle_occured = false;
         // Check to see if a match can be made
-        void check_match(bool verbose_on, int planet_num);
+        void check_match(bool verbose_on, int planet_num, int &num_battles);
 
         // Trade troops one for one
-        void fight(bool verbose_on, int planet_num);
+        void fight(bool verbose_on, int planet_num, int &num_battles);
 
         // Update the running median for troops lost on the planet
         void update_median(int troops_lost);

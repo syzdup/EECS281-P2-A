@@ -47,6 +47,7 @@ int get_int_value(std::string line) {
 // Reads deployments from an input stream
 void read_deployments(std::istream &input_stream, bool verbose_on, bool median_on) {
     std::cout << "Deploying troops...\n";
+    int num_battles = 0;
     int id = 0;
     int timestamp;
     std::string side;
@@ -65,8 +66,12 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
         check_errors(stoi(general_num), stoi(planet_num), stoi(num_troops), stoi(force_sensitivity), timestamp);
         if(timestamp != current_time) {
             // Print median information here
-            if(median_on) {
-                std::cout << "Median troops lost: " << planets[(unsigned long)stoi(planet_num)].get_median() << "\n";
+            if(median_on && num_battles != 0) {
+                for(int i = 0; i < int(planets.size()); ++i) {
+                    if(planets[i].battle_occured) {
+                        std::cout << "Median troops lost on planet " << i << " at time " << current_time << " is " << planets[i].get_median() << "\n";
+                    }
+                }
             }
             current_time = timestamp;
         }
@@ -76,14 +81,25 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
         if(side[0] == 'J') {
             planets[(unsigned long)stoi(planet_num)].jedi_pq.push(temp);
             // After push, check on planet_num to see if a battle will take place there
-            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num));
+            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles);
         // If side is Sith
         } else {
             planets[(unsigned long)stoi(planet_num)].sith_pq.push(temp);
             // After push, check on planet_num to see if a battle will take place there
-            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num));
+            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles);
         }
     }
+    // Print median information again if median mode is on
+    if(median_on && num_battles != 0) {
+        for(int i = 0; i < int(planets.size()); ++i) {
+            if(planets[i].battle_occured) {
+                std::cout << "Median troops lost on planet " << i << " at time " << current_time << " is " << planets[i].get_median() << "\n";
+            }
+        }
+    }
+    // End of day summary
+    std::cout << "---End of Day---\nBattles: " << num_battles << "\n";
+
 }
 
 int main(int argc, char * argv[]) {
@@ -123,8 +139,6 @@ int main(int argc, char * argv[]) {
         read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on());
     }
     // After all battles have been fought
-    // Print median information again
-    // Print end of day summary
     // Print general eval
     // Print movie watcher
 }

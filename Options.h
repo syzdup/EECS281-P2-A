@@ -37,6 +37,7 @@ public:
                     break;
                 case 'w':
                     watcher_on = true;
+                    break;
                 default:
                     std::cerr << "Unknown command line option\n";
                     exit(1);
