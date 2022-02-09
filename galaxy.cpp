@@ -45,9 +45,9 @@ int get_int_value(std::string line) {
 }
 
 // Reads deployments from an input stream
-void read_deployments(std::istream &input_stream, bool verbose_on) {
+void read_deployments(std::istream &input_stream, bool verbose_on, bool median_on) {
     std::cout << "Deploying troops...\n";
-
+    int id = 0;
     int timestamp;
     std::string side;
     std::string general_num;
@@ -65,9 +65,13 @@ void read_deployments(std::istream &input_stream, bool verbose_on) {
         check_errors(stoi(general_num), stoi(planet_num), stoi(num_troops), stoi(force_sensitivity), timestamp);
         if(timestamp != current_time) {
             // Print median information here
+            if(median_on) {
+                std::cout << "Median troops lost: " << planets[(unsigned long)stoi(planet_num)].get_median() << "\n";
+            }
             current_time = timestamp;
         }
-        Deployment temp{timestamp, stoi(general_num), stoi(force_sensitivity), stoi(num_troops)};
+        Deployment temp{id, timestamp, stoi(general_num), stoi(force_sensitivity), stoi(num_troops)};
+        id += 1;
         // If side is Jedi
         if(side[0] == 'J') {
             planets[(unsigned long)stoi(planet_num)].jedi_pq.push(temp);
@@ -101,7 +105,7 @@ int main(int argc, char * argv[]) {
 
     // Mode is deployment list
     if(mode[6] == 'D') {
-        read_deployments(input_stream, oh.get_verbose_on());
+        read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on());
     // Mode is pseudorandom
     } else {
         unsigned int random_seed;
@@ -116,6 +120,11 @@ int main(int argc, char * argv[]) {
         arrival_rate = (unsigned int)get_int_value(line);
 
         P2random::PR_init(ss, random_seed, (unsigned int)num_generals, (unsigned int)planets.size(), num_deployments, arrival_rate);
-        read_deployments(input_stream, oh.get_verbose_on());
+        read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on());
     }
+    // After all battles have been fought
+    // Print median information again
+    // Print end of day summary
+    // Print general eval
+    // Print movie watcher
 }
