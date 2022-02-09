@@ -2,14 +2,15 @@
 #include "Deployment.h"
 #include <queue>
 
-// class Planet {
-//     public:
-//         std::priority_queue<Deployment> jedi_pq;
-//         std::priority_queue<Deployment> sith_pq;
+class Planet {
+    public:
+        std::priority_queue<Deployment, std::vector<Deployment>, Jedi_Comparator> jedi_pq;
+        std::priority_queue<Deployment, std::vector<Deployment>, Sith_Comparator> sith_pq;
 
-// };
+        // Check to see if a match can be made
+        void check_match(bool verbose_on, int planet_num);
 
-struct Planet {
-    std::priority_queue<Deployment, std::vector<Deployment>, Jedi_Comparator> jedi_pq;
-    std::priority_queue<Deployment, std::vector<Deployment>, Sith_Comparator> sith_pq;
+        // Trade troops one for one
+        void fight(bool verbose_on, int planet_num);
+      
 };

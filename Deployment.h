@@ -13,7 +13,7 @@ class Deployment {
 class Sith_Comparator {
     public:
         bool operator()(const Deployment &D1, const Deployment &D2) {
-            if(D1.timestamp < D2.timestamp) {
+            if(D1.force_sensitivity < D2.force_sensitivity) {
                 return true;
             }
             return false;
@@ -23,8 +23,12 @@ class Sith_Comparator {
 class Jedi_Comparator {
     public:
         bool operator()(const Deployment &D1, const Deployment &D2) {
-            if(D1.timestamp < D2.timestamp) {
+            if(D1.force_sensitivity > D2.force_sensitivity) {
                 return true;
+            } else if(D1.force_sensitivity == D2.force_sensitivity) {
+                if(D1.timestamp > D2.timestamp) {
+                    return true;
+                }
             }
             return false;
         }

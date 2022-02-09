@@ -44,8 +44,9 @@ int get_int_value(std::string line) {
     return atoi(line.c_str());
 }
 
-// Reads input from a deployment list file
-void read_deployments(std::istream &input_stream) {
+// Reads deployments from an input stream
+void read_deployments(std::istream &input_stream, bool verbose_on) {
+    std::cout << "Deploying troops...\n";
 
     int timestamp;
     std::string side;
@@ -61,20 +62,22 @@ void read_deployments(std::istream &input_stream) {
         force_sensitivity.erase(0, 1);
         num_troops.erase(0, 1);
         // Error checking
-        // Are these conversions necessary or is there a better way of handling it? Would making more integers increase memory and decrease speed?
         check_errors(stoi(general_num), stoi(planet_num), stoi(num_troops), stoi(force_sensitivity), timestamp);
-        // Update time here
-        current_time = timestamp;
-
+        if(timestamp != current_time) {
+            // Print median information here
+            current_time = timestamp;
+        }
         Deployment temp{timestamp, stoi(general_num), stoi(force_sensitivity), stoi(num_troops)};
         // If side is Jedi
         if(side[0] == 'J') {
             planets[(unsigned long)stoi(planet_num)].jedi_pq.push(temp);
             // After push, check on planet_num to see if a battle will take place there
+            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num));
         // If side is Sith
         } else {
             planets[(unsigned long)stoi(planet_num)].sith_pq.push(temp);
             // After push, check on planet_num to see if a battle will take place there
+            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num));
         }
     }
 }
@@ -98,7 +101,7 @@ int main(int argc, char * argv[]) {
 
     // Mode is deployment list
     if(mode[6] == 'D') {
-        read_deployments(input_stream);
+        read_deployments(input_stream, oh.get_verbose_on());
     // Mode is pseudorandom
     } else {
         unsigned int random_seed;
@@ -113,6 +116,6 @@ int main(int argc, char * argv[]) {
         arrival_rate = (unsigned int)get_int_value(line);
 
         P2random::PR_init(ss, random_seed, (unsigned int)num_generals, (unsigned int)planets.size(), num_deployments, arrival_rate);
-        read_deployments(input_stream);
+        read_deployments(input_stream, oh.get_verbose_on());
     }
 }
