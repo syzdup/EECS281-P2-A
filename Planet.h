@@ -1,5 +1,6 @@
 // Project identifier: AD48FB4835AF347EB0CA8009E24C3B13F8519882
 #include "Deployment.h"
+#include "General.h"
 #include <queue>
 
 class Planet {
@@ -14,10 +15,10 @@ class Planet {
         // Has a battle occured
         bool battle_occured = false;
         // Check to see if a match can be made
-        void check_match(bool verbose_on, int planet_num, int &num_battles);
+        void check_match(bool verbose_on, int planet_num, int &num_battles, bool general_eval_on, std::vector<General> &generals);
 
         // Trade troops one for one
-        void fight(bool verbose_on, int planet_num, int &num_battles);
+        void fight(bool verbose_on, int planet_num, int &num_battles, bool general_eval_on, std::vector<General> &generals);
 
         // Update the running median for troops lost on the planet
         void update_median(int troops_lost);

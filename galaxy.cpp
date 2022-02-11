@@ -5,6 +5,7 @@
 #include "P2random.h"
 
 std::vector<Planet> planets;
+std::vector<General> generals;
 int num_generals;
 int current_time = 0;
 
@@ -45,7 +46,7 @@ int get_int_value(std::string line) {
 }
 
 // Reads deployments from an input stream
-void read_deployments(std::istream &input_stream, bool verbose_on, bool median_on) {
+void read_deployments(std::istream &input_stream, bool verbose_on, bool median_on, bool general_eval_on) {
     std::cout << "Deploying troops...\n";
     int num_battles = 0;
     int id = 0;
@@ -68,8 +69,8 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
             // Print median information here
             if(median_on && num_battles != 0) {
                 for(int i = 0; i < int(planets.size()); ++i) {
-                    if(planets[i].battle_occured) {
-                        std::cout << "Median troops lost on planet " << i << " at time " << current_time << " is " << planets[i].get_median() << ".\n";
+                    if(planets[(unsigned long)i].battle_occured) {
+                        std::cout << "Median troops lost on planet " << i << " at time " << current_time << " is " << planets[(unsigned long)i].get_median() << ".\n";
                     }
                 }
             }
@@ -80,25 +81,45 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
         // If side is Jedi
         if(side[0] == 'J') {
             planets[(unsigned long)stoi(planet_num)].jedi_pq.push(temp);
+            // Update general info
+            if(general_eval_on) {
+                generals[(unsigned long)stoi(general_num)].deployed += stoi(num_troops);
+                generals[(unsigned long)stoi(general_num)].jedi_troops += stoi(num_troops);
+                generals[(unsigned long)stoi(general_num)].survived += stoi(num_troops);
+            }
             // After push, check on planet_num to see if a battle will take place there
-            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles);
+            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles, general_eval_on, generals);
         // If side is Sith
         } else {
             planets[(unsigned long)stoi(planet_num)].sith_pq.push(temp);
+            // Update general info
+            if(general_eval_on) {
+                generals[(unsigned long)stoi(general_num)].deployed += stoi(num_troops);
+                generals[(unsigned long)stoi(general_num)].sith_troops += stoi(num_troops);
+                generals[(unsigned long)stoi(general_num)].survived += stoi(num_troops);
+            }
             // After push, check on planet_num to see if a battle will take place there
-            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles);
+            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles, general_eval_on, generals);
         }
     }
     // Print median information again if median mode is on
     if(median_on && num_battles != 0) {
         for(int i = 0; i < int(planets.size()); ++i) {
-            if(planets[i].battle_occured) {
-                std::cout << "Median troops lost on planet " << i << " at time " << current_time << " is " << planets[i].get_median() << ".\n";
+            if(planets[(unsigned long)i].battle_occured) {
+                std::cout << "Median troops lost on planet " << i << " at time " << current_time << " is " << planets[(unsigned long)i].get_median() << ".\n";
             }
         }
     }
     // End of day summary
     std::cout << "---End of Day---\nBattles: " << num_battles << "\n";
+
+    // General eval
+    if(general_eval_on) {
+        for(int i = 0; i < int(generals.size()); ++i) {
+            std::cout << "General " << i << " deployed " << generals[(unsigned long)i].jedi_troops << " Jedi troops and " 
+            << generals[(unsigned long)i].sith_troops << " Sith troops, and " << generals[(unsigned long)i].survived << "/" << generals[(unsigned long)i].deployed << " survived.\n";
+        }
+    }
 
 }
 
@@ -113,6 +134,9 @@ int main(int argc, char * argv[]) {
     getline(std::cin, mode);
     getline(std::cin, line);
     num_generals = get_int_value(line);
+    if(oh.get_general_eval_on()) {
+        generals.resize((unsigned long)num_generals);
+    }
     getline(std::cin, line);
     planets.resize((unsigned long)get_int_value(line));
 
@@ -121,7 +145,7 @@ int main(int argc, char * argv[]) {
 
     // Mode is deployment list
     if(mode[6] == 'D') {
-        read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on());
+        read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on(), oh.get_general_eval_on());
     // Mode is pseudorandom
     } else {
         unsigned int random_seed;
@@ -136,7 +160,7 @@ int main(int argc, char * argv[]) {
         arrival_rate = (unsigned int)get_int_value(line);
 
         P2random::PR_init(ss, random_seed, (unsigned int)num_generals, (unsigned int)planets.size(), num_deployments, arrival_rate);
-        read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on());
+        read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on(), oh.get_general_eval_on());
     }
     // After all battles have been fought
     // Print general eval
