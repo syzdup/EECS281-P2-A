@@ -115,6 +115,7 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
 
     // General eval
     if(general_eval_on) {
+        std::cout << "---General Evaluation---\n";
         for(int i = 0; i < int(generals.size()); ++i) {
             std::cout << "General " << i << " deployed " << generals[(unsigned long)i].jedi_troops << " Jedi troops and " 
             << generals[(unsigned long)i].sith_troops << " Sith troops, and " << generals[(unsigned long)i].survived << "/" << generals[(unsigned long)i].deployed << " survived.\n";
