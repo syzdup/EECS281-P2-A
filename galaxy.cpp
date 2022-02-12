@@ -46,7 +46,7 @@ int get_int_value(std::string line) {
 }
 
 // Reads deployments from an input stream
-void read_deployments(std::istream &input_stream, bool verbose_on, bool median_on, bool general_eval_on) {
+void read_deployments(std::istream &input_stream, bool verbose_on, bool median_on, bool general_eval_on, bool watcher_on) {
     std::cout << "Deploying troops...\n";
     int num_battles = 0;
     int id = 0;
@@ -81,25 +81,33 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
         // If side is Jedi
         if(side[0] == 'J') {
             planets[(unsigned long)stoi(planet_num)].jedi_pq.push(temp);
-            // Update general info
+            // If general eval on update general info
             if(general_eval_on) {
                 generals[(unsigned long)stoi(general_num)].deployed += stoi(num_troops);
                 generals[(unsigned long)stoi(general_num)].jedi_troops += stoi(num_troops);
                 generals[(unsigned long)stoi(general_num)].survived += stoi(num_troops);
             }
+            // If watcher mode is on, update the best possible attack and ambush passing in 1 for Jedi
+            if(watcher_on) {
+                planets[(unsigned long)stoi(planet_num)].update_best_attack(temp.timestamp, temp.force_sensitivity, 1);
+            }
             // After push, check on planet_num to see if a battle will take place there
-            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles, general_eval_on, generals);
+            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles, general_eval_on, generals, watcher_on);
         // If side is Sith
         } else {
             planets[(unsigned long)stoi(planet_num)].sith_pq.push(temp);
-            // Update general info
+            // If general eval on update general info
             if(general_eval_on) {
                 generals[(unsigned long)stoi(general_num)].deployed += stoi(num_troops);
                 generals[(unsigned long)stoi(general_num)].sith_troops += stoi(num_troops);
                 generals[(unsigned long)stoi(general_num)].survived += stoi(num_troops);
             }
+            // If watcher mode is on, update the best possible attack and ambush passing in 0 for Sith
+            if(watcher_on) {
+                planets[(unsigned long)stoi(planet_num)].update_best_attack(temp.timestamp, temp.force_sensitivity, 0);
+            }
             // After push, check on planet_num to see if a battle will take place there
-            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles, general_eval_on, generals);
+            planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles, general_eval_on, generals, watcher_on);
         }
     }
     // Print median information again if median mode is on
@@ -119,6 +127,20 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
         for(int i = 0; i < int(generals.size()); ++i) {
             std::cout << "General " << i << " deployed " << generals[(unsigned long)i].jedi_troops << " Jedi troops and " 
             << generals[(unsigned long)i].sith_troops << " Sith troops, and " << generals[(unsigned long)i].survived << "/" << generals[(unsigned long)i].deployed << " troops survived.\n";
+        }
+    }
+    if(watcher_on) {
+        std::cout << "---Movie Watcher---\n";
+        // Loop and print attacks
+        for(int i = 0; i < int(planets.size()); ++i) {
+            if(planets[(unsigned long)i].best_jedi_attack.best_timestamp == -1 || planets[(unsigned long)i].best_sith_attack.best_timestamp == -1) {
+                planets[(unsigned long)i].best_jedi_attack.best_timestamp = -1;
+                planets[(unsigned long)i].best_sith_attack.best_timestamp = -1;
+            }
+            std::cout << "A movie watcher would enjoy an attack on planet " << i << " with Jedi at time " <<
+            planets[(unsigned long)i].best_jedi_attack.best_timestamp << " and Sith at time " << planets[(unsigned long)i].best_sith_attack.best_timestamp <<
+            " with a force difference of " << planets[(unsigned long)i].best_sith_attack.best_force_sensitivity - planets[(unsigned long)i].best_jedi_attack.best_force_sensitivity <<
+            ".\n";
         }
     }
 
@@ -146,7 +168,7 @@ int main(int argc, char * argv[]) {
 
     // Mode is deployment list
     if(mode[6] == 'D') {
-        read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on(), oh.get_general_eval_on());
+        read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on(), oh.get_general_eval_on(), oh.get_watcher_on());
     // Mode is pseudorandom
     } else {
         unsigned int random_seed;
@@ -161,9 +183,6 @@ int main(int argc, char * argv[]) {
         arrival_rate = (unsigned int)get_int_value(line);
 
         P2random::PR_init(ss, random_seed, (unsigned int)num_generals, (unsigned int)planets.size(), num_deployments, arrival_rate);
-        read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on(), oh.get_general_eval_on());
+        read_deployments(input_stream, oh.get_verbose_on(), oh.get_median_on(), oh.get_general_eval_on(), oh.get_watcher_on());
     }
-    // After all battles have been fought
-    // Print general eval
-    // Print movie watcher
 }
