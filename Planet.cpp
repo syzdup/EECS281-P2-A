@@ -157,3 +157,53 @@ void Planet::update_best_attack(int time, int force, bool side) {
     }
     // If end is reached with no force differences, i.e best attack jedi --- OR --- best attack sith is still {-1,-1}, then set both times to -1
 }
+
+void Planet::update_best_ambush(int time, int force, bool side) {
+    // If it is a Sith deployment
+    if(!side) {
+        // First Sith encountered
+        if(best_sith_ambush.best_timestamp == -1) {
+            best_sith_ambush = {time, force};
+        // New Sith
+        } else {
+            if(force > best_sith_ambush.best_force_sensitivity) {
+                // Jedi hasn't been encountered yet
+                if(best_jedi_ambush.best_timestamp == -1) {
+                    best_sith_ambush = {time, force};
+                } else {
+                    if(best_maybe_sith.best_force_sensitivity == -1) {
+                        best_maybe_sith = {time, force};
+                    } else {
+                        if(force > best_maybe_sith.best_force_sensitivity) {
+                            best_maybe_sith = {time, force};
+                        }
+                    }
+                }
+            }
+        }
+    // If it is a Jedi deployment
+    } else {
+        // Only update new Sith if a Jedi has came before it
+        if(best_sith_ambush.best_timestamp != -1) {
+            // First Sith encountered
+            if(best_jedi_ambush.best_timestamp == -1) {
+                if(force <= best_sith_ambush.best_force_sensitivity) {
+                    best_jedi_ambush = {time, force};
+                }
+            // New Jedi encountered
+            } else {
+                if(best_maybe_sith.best_force_sensitivity != -1) {
+                    if((best_maybe_sith.best_force_sensitivity - force) > (best_sith_ambush.best_force_sensitivity - best_jedi_ambush.best_force_sensitivity)) {
+                        best_sith_ambush.best_force_sensitivity = best_maybe_sith.best_force_sensitivity;
+                        best_sith_ambush.best_timestamp = best_maybe_sith.best_timestamp;
+                        best_jedi_ambush = {time, force};
+                    }
+                } else {
+                    if((best_sith_ambush.best_force_sensitivity - force) > (best_sith_ambush.best_force_sensitivity - best_jedi_ambush.best_force_sensitivity)) {
+                        best_jedi_ambush = {time, force};
+                    }
+                }
+            }
+        }
+    } 
+}

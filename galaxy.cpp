@@ -90,6 +90,7 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
             // If watcher mode is on, update the best possible attack and ambush passing in 1 for Jedi
             if(watcher_on) {
                 planets[(unsigned long)stoi(planet_num)].update_best_attack(temp.timestamp, temp.force_sensitivity, 1);
+                planets[(unsigned long)stoi(planet_num)].update_best_ambush(temp.timestamp, temp.force_sensitivity, 1);
             }
             // After push, check on planet_num to see if a battle will take place there
             planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles, general_eval_on, generals, watcher_on);
@@ -105,6 +106,7 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
             // If watcher mode is on, update the best possible attack and ambush passing in 0 for Sith
             if(watcher_on) {
                 planets[(unsigned long)stoi(planet_num)].update_best_attack(temp.timestamp, temp.force_sensitivity, 0);
+                planets[(unsigned long)stoi(planet_num)].update_best_ambush(temp.timestamp, temp.force_sensitivity, 0);
             }
             // After push, check on planet_num to see if a battle will take place there
             planets[(unsigned long)stoi(planet_num)].check_match(verbose_on, stoi(planet_num), num_battles, general_eval_on, generals, watcher_on);
@@ -133,6 +135,16 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
         std::cout << "---Movie Watcher---\n";
         // Loop and print attacks
         for(int i = 0; i < int(planets.size()); ++i) {
+            // Ambush
+            if(planets[(unsigned long)i].best_jedi_ambush.best_timestamp == -1 || planets[(unsigned long)i].best_sith_ambush.best_timestamp == -1) {
+                planets[(unsigned long)i].best_jedi_ambush.best_timestamp = -1;
+                planets[(unsigned long)i].best_sith_ambush.best_timestamp = -1;
+            }
+            std::cout << "A movie watcher would enjoy an ambush on planet " << i << " with Sith at time " <<
+            planets[(unsigned long)i].best_sith_ambush.best_timestamp << " and Jedi at time " << planets[(unsigned long)i].best_jedi_ambush.best_timestamp <<
+            " with a force difference of " << planets[(unsigned long)i].best_sith_ambush.best_force_sensitivity - planets[(unsigned long)i].best_jedi_ambush.best_force_sensitivity <<
+            ".\n";
+            // Attack
             if(planets[(unsigned long)i].best_jedi_attack.best_timestamp == -1 || planets[(unsigned long)i].best_sith_attack.best_timestamp == -1) {
                 planets[(unsigned long)i].best_jedi_attack.best_timestamp = -1;
                 planets[(unsigned long)i].best_sith_attack.best_timestamp = -1;
