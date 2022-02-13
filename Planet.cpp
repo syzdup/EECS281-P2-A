@@ -142,7 +142,7 @@ void Planet::update_best_attack(int time, int force, bool side) {
             // New Sith encountered
             } else {
                 if(best_maybe_jedi.best_force_sensitivity != -1) {
-                    if((force - best_maybe_jedi.best_force_sensitivity) > (force - best_jedi_attack.best_force_sensitivity)) {
+                    if((force - best_maybe_jedi.best_force_sensitivity) > (best_sith_attack.best_force_sensitivity - best_jedi_attack.best_force_sensitivity)) {
                         best_jedi_attack.best_force_sensitivity = best_maybe_jedi.best_force_sensitivity;
                         best_jedi_attack.best_timestamp = best_maybe_jedi.best_timestamp;
                         best_sith_attack = {time, force};
