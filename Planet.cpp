@@ -205,5 +205,5 @@ void Planet::update_best_ambush(int time, int force, bool side) {
                 }
             }
         }
-    } 
+    }
 }

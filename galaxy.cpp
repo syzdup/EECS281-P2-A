@@ -139,6 +139,8 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
             if(planets[(unsigned long)i].best_jedi_ambush.best_timestamp == -1 || planets[(unsigned long)i].best_sith_ambush.best_timestamp == -1) {
                 planets[(unsigned long)i].best_jedi_ambush.best_timestamp = -1;
                 planets[(unsigned long)i].best_sith_ambush.best_timestamp = -1;
+                planets[(unsigned long)i].best_jedi_ambush.best_force_sensitivity = 0;
+                planets[(unsigned long)i].best_sith_ambush.best_force_sensitivity = 0;
             }
             std::cout << "A movie watcher would enjoy an ambush on planet " << i << " with Sith at time " <<
             planets[(unsigned long)i].best_sith_ambush.best_timestamp << " and Jedi at time " << planets[(unsigned long)i].best_jedi_ambush.best_timestamp <<
@@ -148,6 +150,8 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
             if(planets[(unsigned long)i].best_jedi_attack.best_timestamp == -1 || planets[(unsigned long)i].best_sith_attack.best_timestamp == -1) {
                 planets[(unsigned long)i].best_jedi_attack.best_timestamp = -1;
                 planets[(unsigned long)i].best_sith_attack.best_timestamp = -1;
+                planets[(unsigned long)i].best_jedi_attack.best_force_sensitivity = 0;
+                planets[(unsigned long)i].best_sith_attack.best_force_sensitivity = 0;
             }
             std::cout << "A movie watcher would enjoy an attack on planet " << i << " with Jedi at time " <<
             planets[(unsigned long)i].best_jedi_attack.best_timestamp << " and Sith at time " << planets[(unsigned long)i].best_sith_attack.best_timestamp <<
