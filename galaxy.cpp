@@ -163,6 +163,7 @@ void read_deployments(std::istream &input_stream, bool verbose_on, bool median_o
 }
 
 int main(int argc, char * argv[]) {
+    std::ios_base::sync_with_stdio(false);
     Option_handler oh;
     oh.get_options(argc, argv);
 
